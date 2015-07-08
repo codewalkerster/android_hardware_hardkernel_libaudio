@@ -2030,11 +2030,17 @@ status_t AudioHardware::AudioStreamInALSA::open_l()
     TRACE_DRIVER_OUT
     if (!pcm_is_ready(mPcm)) {
         ALOGE("cannot open pcm_in driver: %s\n", pcm_get_error(mPcm));
-        TRACE_DRIVER_IN(DRV_PCM_CLOSE)
-        pcm_close(mPcm);
+        TRACE_DRIVER_IN(DRV_PCM_OPEN)
+	    mPcm = pcm_open(0, 1, flags, &config);
         TRACE_DRIVER_OUT
-        mPcm = NULL;
-        return NO_INIT;
+        if (!pcm_is_ready(mPcm)) {
+            ALOGE("cannot open pcm_in driver: %s\n", pcm_get_error(mPcm));
+            TRACE_DRIVER_IN(DRV_PCM_CLOSE)
+            pcm_close(mPcm);
+            TRACE_DRIVER_OUT
+            mPcm = NULL;
+            return NO_INIT;
+        }
     }
 
     if (mDownSampler != NULL) {

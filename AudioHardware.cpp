@@ -797,6 +797,7 @@ struct pcm *AudioHardware::openPcmOut_l()
             start_threshold : 0,
             stop_threshold : 0,
             silence_threshold : 0,
+            avail_min : 0,
         };
 
 	    /* Test for USB and adjust */
@@ -804,12 +805,14 @@ struct pcm *AudioHardware::openPcmOut_l()
 	    bool haveAlternateCard = (mMixerAlternate != NULL);
 	
 	    if (haveAlternateCard) {
-	        config.rate = 48000;
+	        config.rate = AUDIO_HW_OUT_SAMPLERATE;
+	        config.format = PCM_FORMAT_S16_LE;
+	        config.channels = 2;
 	        mixer_close(mMixerAlternate);
 	    }
 
         TRACE_DRIVER_IN(DRV_PCM_OPEN)
-	    ALOGV("Have alternate card: %d using %dHz rate",haveAlternateCard, config.rate);
+	    ALOGD("Have alternate card: %d using %dHz rate",haveAlternateCard, config.rate);
 	    mPcm = pcm_open(haveAlternateCard ? 1 : 0, 0, flags, &config);
         TRACE_DRIVER_OUT
         if (!pcm_is_ready(mPcm)) {
@@ -2013,19 +2016,22 @@ status_t AudioHardware::AudioStreamInALSA::open_l()
         start_threshold : 0,
         stop_threshold : 0,
         silence_threshold : 0,
+        avail_min : 0,
     };
     /* Test for USB and adjust */
     struct mixer*   mMixerAlternate = mixer_open(1);
     bool haveAlternateCard = (mMixerAlternate != NULL);
 
     if (haveAlternateCard) {
-        config.rate = 48000;
+        config.rate = AUDIO_HW_IN_SAMPLERATE;
+        config.format = PCM_FORMAT_S16_LE;
+        config.channels = 2;
         mixer_close(mMixerAlternate);
     }
 
     ALOGV("open pcm_in driver");
     TRACE_DRIVER_IN(DRV_PCM_OPEN)
-    ALOGV("Have alternate card: %d using %dHz rate",haveAlternateCard, config.rate);
+    ALOGD("Have alternate card: %d using %dHz rate",haveAlternateCard, config.rate);
     mPcm = pcm_open(haveAlternateCard ? 1 : 0, 0, flags, &config);
     TRACE_DRIVER_OUT
     if (!pcm_is_ready(mPcm)) {

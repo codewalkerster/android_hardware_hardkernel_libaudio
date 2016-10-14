@@ -2025,7 +2025,7 @@ status_t AudioHardware::AudioStreamInALSA::open_l()
     if (haveAlternateCard) {
         config.rate = AUDIO_HW_IN_SAMPLERATE;
         config.format = PCM_FORMAT_S16_LE;
-        config.channels = 2;
+        //config.channels = 2;
         mixer_close(mMixerAlternate);
     }
 
